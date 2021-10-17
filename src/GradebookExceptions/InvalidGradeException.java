@@ -1,3 +1,8 @@
+/*
+ * Jackson Cozzi
+ * jcozzi
+ * Gradebook Project
+ */
 package GradebookExceptions;
 
 @SuppressWarnings("serial")

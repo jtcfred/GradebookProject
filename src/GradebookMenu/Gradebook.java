@@ -1,3 +1,8 @@
+/*
+ * Jackson Cozzi
+ * jcozzi
+ * Gradebook Project
+ */
 package GradebookMenu;
 
 import java.time.LocalDate;
@@ -9,6 +14,7 @@ import GradebookExceptions.*;
 
 public class Gradebook {
 	
+	//some static variables to use in my functions at the bottom
 	static Assignment[] gradebook;
 	static int index = 0;
 	static Scanner sc = new Scanner(System.in);
@@ -17,6 +23,7 @@ public class Gradebook {
 		
 		System.out.println("Welcome to the Gradebook");
 		int size = 0;
+		//make sure the size of the gradebook from user input is valid
 		do {
 			try {
 				System.out.println("Enter the size of the gradebook (max of 20, min of 1): ");
@@ -34,6 +41,7 @@ public class Gradebook {
 			break;
 		} while(true);
 		
+		//initialize the gradebook with the specified size
 		gradebook = new Assignment[size];
 		
 		int menuChoice = 5;
@@ -46,7 +54,10 @@ public class Gradebook {
 						"6 - Print discussion associated readings" + "\n" +
 						"7 - Print program concepts" + "\n" + 
 						"8 - Exit program" + "\n";
+		
+		//give the user menu options until they make a valid selection from the options
 		do {
+			
 			try {
 				System.out.println("Please select an option from below: ");
 				System.out.println(menu);
@@ -55,6 +66,8 @@ public class Gradebook {
 				System.out.println("You must enter a valid number for the selection.");
 				continue;
 			}
+			
+			
 			switch(menuChoice) {
 			case 0:
 				System.out.println("You selected add grade");
@@ -100,8 +113,10 @@ public class Gradebook {
 		sc.close();
 	}
 	
+	//This function prompts the user for a score and returns it as a double
 	static double getScoreInput() {
 		double score;
+		//only allow input that can be parsed into a double
 		do {
 			try {
 				System.out.println("Enter the score as a double: ");
@@ -110,8 +125,9 @@ public class Gradebook {
 				System.out.println("You must enter a valid score.");
 				continue;
 			}
+			//only allow the score to be between 0 and 100
 			if(score < 0 || score > 100) {
-				System.out.println("Please make sure the score is within valid range.");
+				System.out.println("Please make sure the score is within valid range [0,100].");
 				continue;
 			}
 			break;
@@ -120,6 +136,7 @@ public class Gradebook {
 		
 	}
 	
+	//this function calculates the letter grade based on the score and returns the letter
 	static char getLetter(double score) {
 		char letter;
 		if(score >= 90) {
@@ -136,6 +153,7 @@ public class Gradebook {
 		return letter;
 	}
 	
+	//this function prompts the user for the name of the grade and returns it
 	static String getNameInput() {
 		String name;
 		System.out.println("Enter the name of the assignment");
@@ -143,7 +161,9 @@ public class Gradebook {
 		return name;
 	}
 	
+	//this function prompts the user for a date in a specified format and returns it
 	static LocalDate getDueDateInput() {
+		//only all input that is in the specified format
 		LocalDate dueDate;
 		do {
 			try {
@@ -159,7 +179,7 @@ public class Gradebook {
 		return dueDate;
 	}
 	
-	//Adds a grade at index in the gradebook
+	//Adds a grade at the current index in the gradebook
 	static void addGrade() {
 		try {
 			if(index == gradebook.length) {
@@ -236,6 +256,7 @@ public class Gradebook {
 				System.out.println("Enter the name of the reading:");
 				String reading = sc.nextLine();
 				
+				//make the discussion object and add to the gradebook
 				Discussion discussion = new Discussion(score, letter, name, dueDate, reading);
 				gradebook[index] = discussion;
 				index++;
@@ -259,6 +280,7 @@ public class Gradebook {
 				System.out.println("Enter the name of the concept:");
 				String concept = sc.nextLine();
 				
+				//make the program object and add to the gradebook
 				Program program = new Program(score, letter, name, dueDate, concept);
 				gradebook[index] = program;
 				index++;
@@ -269,8 +291,10 @@ public class Gradebook {
 		} while(true);
 	}
 	
+	//this function removes a grade specified by the user by name
 	static void removeGrade() {
 		
+		//don't let the user remove a grade if the gradebook is empty
 		try {
 			if(index == 0) {
 				throw new GradebookEmptyException();
@@ -279,18 +303,27 @@ public class Gradebook {
 			System.out.println("The gradebook is currently empty. There are no grades to remove");
 			return;
 		}
+		
 		System.out.println("Enter the name of the grade you want to remove: ");
 		String name = sc.nextLine();
 		int i;
 		for(i = 0; i < index; i++) {
 			if(name.equals(gradebook[i].getName())) {
-				//shift all grades after the one we want to remove, 1 to the left
-				for(int j = i; j < index; j++) {
+				//handle edge case where the element being removed is at the position
+				if(i == gradebook.length - 1) {
+					gradebook[i] = null;
+					index--;
+					return;
+				}
+				//shift all grades after the one we want to remove, 1 position to the left
+				for(int j = i; j < index - 1; j++) {
 					gradebook[j] = gradebook[j + 1];
 				}
-				break;
+				index--;
+				return;
 			}
 		}
+		//if the grade wasn't found, throw exception
 		try {
 			if(i == index) {
 				throw new InvalidGradeException();
@@ -301,7 +334,10 @@ public class Gradebook {
 		}
 	}
 	
+	//this function prints out all of the grades currently in the gradebook
 	static void printGrades() {
+		
+		//throw exception if the gradebook is empty
 		System.out.println("\n");
 		try {
 			if(index == 0) {
@@ -311,12 +347,18 @@ public class Gradebook {
 			System.out.println("The gradebook is empty. There are no grades to print.");
 			return;
 		}
+		
+		//print all of the grades to console
 		for(int i = 0; i < index; i++) {
 			System.out.println(gradebook[i].toString() + "\n");
 		}
+		
 	}
 	
+	//this function prints the average score of all of the grades in the gradebook
 	static void printAverage() {
+		
+		//throw exception if gradebook is empty
 		try {
 			if(index == 0) {
 				throw new GradebookEmptyException();
@@ -325,6 +367,8 @@ public class Gradebook {
 			System.out.println("The gradebook is empty. There are no grades to average.");
 			return;
 		}
+		
+		//calculate the average
 		double total = 0;
 		for(int i = 0; i < index; i++) {
 			total += gradebook[i].getScore();
@@ -332,8 +376,10 @@ public class Gradebook {
 		System.out.println("Average: " + (total / (index)));
 	}
 	
+	//this function prints the max and min scores of the gradebook
 	static void printExtrema() {
 		
+		//throw exception if the gradebook is empty
 		try {
 			if(index == 0) {
 				throw new GradebookEmptyException();
@@ -342,6 +388,8 @@ public class Gradebook {
 			System.out.println("The gradebook is empty. There are no extrema to print.");
 			return;
 		}
+		
+		//calculate the max and min
 		double max, min;
 		max = min = gradebook[0].getScore();
 		for(int i = 1; i < index; i++) {
@@ -352,20 +400,38 @@ public class Gradebook {
 				min = gradebook[i].getScore();
 			}
 		}
+		
+		//print to console
 		System.out.println("The maximum score in the gradebook is: " + max);
 		System.out.println("The minimum score in the gradebook is: " + min);
 	}
 	
+	//prints the average number of questions on all of the current quizzes
 	static void printQuizAverage() {
+		
+		//throw exception if the gradebook is empty
+		try {
+			if(index == 0) {
+				throw new GradebookEmptyException();
+			}
+		} catch(GradebookEmptyException e) {
+			System.out.println("The gradebook is empty. There are no extrema to print.");
+			return;
+		}
+		
+		
 		double avg = 0;
 		int total = 0;
 		for(int i = 0; i < index; i++) {
+			//if the grade is a quiz, add its question count to total
 			if(gradebook[i] instanceof Quiz) {
 				total++;
 				Quiz temp = (Quiz)gradebook[i];
 				avg += temp.getQuestionCount();	
 			}
 		}
+		
+		//print the average to console if there are quizzes
 		if(total == 0) {
 			System.out.println("There are no quizzes yet.");
 		} else {
@@ -375,29 +441,60 @@ public class Gradebook {
 		
 	}
 	
+	//prints all of the readings from discussions to console
 	static void printReadings() {
+		
+		//throw exception if the gradebook is empty
+		try {
+			if(index == 0) {
+				throw new GradebookEmptyException();
+			}
+		} catch(GradebookEmptyException e) {
+			System.out.println("The gradebook is empty. There are no extrema to print.");
+			return;
+		}
+		
+		
 		int total = 0;
 		for(int i = 0; i < index; i++) {
+			//if the grade is a discussion, print its reading to console
 			if(gradebook[i] instanceof Discussion) {
 				Discussion temp = (Discussion)gradebook[i];
 				System.out.println("" + total + ". " + temp.getReading());
 				total++;
 			}
 		}
+		
+		//if there are no discussions, let user know
 		if(total == 0) {
 			System.out.println("There are no Discussions yet.");
 		}
 	}
 	
+	//prints all of the concepts from programs to console
 	static void printConcepts() {
+		
+		//throw exception if the gradebook is empty
+		try {
+			if(index == 0) {
+				throw new GradebookEmptyException();
+			}
+		} catch(GradebookEmptyException e) {
+			System.out.println("The gradebook is empty. There are no extrema to print.");
+			return;
+		}
+		
 		int total = 0;
 		for(int i = 0; i < index; i++) {
+			//if the grade is a program, print its concept to console
 			if(gradebook[i] instanceof Program) {
 				Program temp = (Program)gradebook[i];
 				System.out.println("" + total + ". " + temp.getConcept());
 				total++;
 			}
 		}
+		
+		//if there are no programs, let the user know
 		if(total == 0) {
 			System.out.println("There are no Programs yet.");
 		}

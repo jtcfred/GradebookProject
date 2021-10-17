@@ -1,3 +1,8 @@
+/*
+ * Jackson Cozzi
+ * jcozzi
+ * Gradebook Project
+ */
 package Assignments;
 
 import java.time.LocalDate;
