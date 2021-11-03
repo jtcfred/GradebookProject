@@ -66,40 +66,40 @@ public class Gradebook {
 			switch(menuChoice) {
 			case 0:
 				System.out.println("You selected add grade");
-				GradebookHelper.addGrade(gradebook, index, sc);
+				GradebookHelper.addGrade();
 				break;
 			case 1:
 				System.out.println("You selected remove grade");
-				GradebookHelper.removeGrade(gradebook, index, sc);
+				GradebookHelper.removeGrade();
 				break;
 			case 2:
 				System.out.println("You selected print grades");
-				GradebookHelper.printGrades(gradebook, index);
+				GradebookHelper.printGrades();
 				System.out.println("");
 				break;
 			case 3:
 				System.out.println("You selected you selected print average");
-				GradebookHelper.printAverage(gradebook, index);
+				GradebookHelper.printAverage();
 				System.out.println("");
 				break;
 			case 4:
 				System.out.println("You selected print extrema");
-				GradebookHelper.printExtrema(gradebook, index);
+				GradebookHelper.printExtrema();
 				System.out.println("");
 				break;
 			case 5:
 				System.out.println("You selected print quiz average");
-				GradebookHelper.printQuizAverage(gradebook, index);
+				GradebookHelper.printQuizAverage();
 				System.out.println("");
 				break;
 			case 6:
 				System.out.println("You selected print readings");
-				GradebookHelper.printReadings(gradebook, index);
+				GradebookHelper.printReadings();
 				System.out.println("");
 				break;
 			case 7:
 				System.out.println("You selected print concepts");
-				GradebookHelper.printConcepts(gradebook, index);
+				GradebookHelper.printConcepts();
 				System.out.println("");
 				break;
 			}

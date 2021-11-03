@@ -7,7 +7,6 @@ package GradebookMenu;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
-import java.util.Scanner;
 
 import Assignments.*;
 import GradebookExceptions.*;
@@ -15,13 +14,13 @@ import GradebookExceptions.*;
 public class GradebookHelper {
 
 	//This function prompts the user for a score and returns it as a double
-	static double getScoreInput(Scanner sc) {
+	static double getScoreInput() {
 		double score;
 		//only allow input that can be parsed into a double
 		do {
 			try {
 				System.out.println("Enter the score as a double: ");
-				score = Double.parseDouble(sc.nextLine());
+				score = Double.parseDouble(Gradebook.sc.nextLine());
 			}catch(NumberFormatException e) {
 				System.out.println("You must enter a valid score.");
 				continue;
@@ -55,22 +54,22 @@ public class GradebookHelper {
 	}
 	
 	//this function prompts the user for the name of the grade and returns it
-	static String getNameInput(Scanner sc) {
+	static String getNameInput() {
 		String name;
 		System.out.println("Enter the name of the assignment");
-		name = sc.nextLine();
+		name = Gradebook.sc.nextLine();
 		return name;
 	}
 	
 	//this function prompts the user for a date in a specified format and returns it
-	static LocalDate getDueDateInput(Scanner sc) {
+	static LocalDate getDueDateInput() {
 		//only all input that is in the specified format
 		LocalDate dueDate;
 		do {
 			try {
 				System.out.println("Enter the due date in the format: " + "\n" +
 						"yyyy-mm-dd");
-				dueDate = LocalDate.parse(sc.nextLine());
+				dueDate = LocalDate.parse(Gradebook.sc.nextLine());
 			}catch(DateTimeParseException e) {
 				System.out.println("You must enter a valid due date.");
 				continue;
@@ -81,9 +80,9 @@ public class GradebookHelper {
 	}
 	
 	//Adds a grade at the current index in the gradebook
-	static void addGrade(Assignment[]gradebook, int index, Scanner sc) {
+	static void addGrade() {
 		try {
-			if(index == gradebook.length) {
+			if(Gradebook.index == Gradebook.gradebook.length) {
 				throw new GradebookFullException();
 			}
 		} catch(GradebookFullException e) {
@@ -97,7 +96,7 @@ public class GradebookHelper {
 				System.out.println("0 - Quiz" + "\n" +
 									"1 - Discussion" + "\n" +
 									"2 - Program");
-				input = Integer.parseInt(sc.nextLine());
+				input = Integer.parseInt(Gradebook.sc.nextLine());
 			} catch(NumberFormatException e) {
 				System.out.println("You must enter a valid number for the selection.");
 				continue;
@@ -105,23 +104,23 @@ public class GradebookHelper {
 			if(input == 0) {
 				
 				//Get the score
-				double score = getScoreInput(sc);
+				double score = getScoreInput();
 				
 				//get the letter grade
 				char letter = getLetter(score);
 				
 				//get the name
-				String name = getNameInput(sc);
+				String name = getNameInput();
 				
 				//get the due date
-				LocalDate dueDate = getDueDateInput(sc);
+				LocalDate dueDate = getDueDateInput();
 				
 				//get the question count
 				int questionCount;
 				do {
 					try {
 						System.out.println("Enter the number of questions in the quiz:");
-						questionCount = Integer.parseInt(sc.nextLine());
+						questionCount = Integer.parseInt(Gradebook.sc.nextLine());
 					}catch(NumberFormatException e) {
 						System.out.println("You must enter a valid question amount.");
 						continue;
@@ -135,56 +134,56 @@ public class GradebookHelper {
 				
 				//Make the quiz object and add to the gradebook
 				Quiz quiz = new Quiz(score, letter, name, dueDate, questionCount);
-				gradebook[index] = quiz;
-				index++;
+				Gradebook.gradebook[Gradebook.index] = quiz;
+				Gradebook.index++;
 				break;
 			}
 			if(input == 1) {
 				
 				//Get the score
-				double score = getScoreInput(sc);
+				double score = getScoreInput();
 				
 				//get the letter grade
 				char letter = getLetter(score);
 				
 				//get the name
-				String name = getNameInput(sc);
+				String name = getNameInput();
 				
 				//get the due date
-				LocalDate dueDate = getDueDateInput(sc);
+				LocalDate dueDate = getDueDateInput();
 				
 				//get the reading
 				System.out.println("Enter the name of the reading:");
-				String reading = sc.nextLine();
+				String reading = Gradebook.sc.nextLine();
 				
 				//make the discussion object and add to the gradebook
 				Discussion discussion = new Discussion(score, letter, name, dueDate, reading);
-				gradebook[index] = discussion;
-				index++;
+				Gradebook.gradebook[Gradebook.index] = discussion;
+				Gradebook.index++;
 				break;
 			}
 			if(input == 2) {
 				
 				//Get the score
-				double score = getScoreInput(sc);
+				double score = getScoreInput();
 				
 				//get the letter grade
 				char letter = getLetter(score);
 				
 				//get the name
-				String name = getNameInput(sc);
+				String name = getNameInput();
 				
 				//get the due date
-				LocalDate dueDate = getDueDateInput(sc);
+				LocalDate dueDate = getDueDateInput();
 				
 				//get the concept
 				System.out.println("Enter the name of the concept:");
-				String concept = sc.nextLine();
+				String concept = Gradebook.sc.nextLine();
 				
 				//make the program object and add to the gradebook
 				Program program = new Program(score, letter, name, dueDate, concept);
-				gradebook[index] = program;
-				index++;
+				Gradebook.gradebook[Gradebook.index] = program;
+				Gradebook.index++;
 				break;
 			}
 			//if it makes it here, they did not make a valid selection
@@ -193,11 +192,11 @@ public class GradebookHelper {
 	}
 	
 	//this function removes a grade specified by the user by name
-	static void removeGrade(Assignment[]gradebook, int index, Scanner sc) {
+	static void removeGrade() {
 		
 		//don't let the user remove a grade if the gradebook is empty
 		try {
-			if(index == 0) {
+			if(Gradebook.index == 0) {
 				throw new GradebookEmptyException();
 			}
 		} catch (GradebookEmptyException e) {
@@ -206,27 +205,27 @@ public class GradebookHelper {
 		}
 		
 		System.out.println("Enter the name of the grade you want to remove: ");
-		String name = sc.nextLine();
+		String name = Gradebook.sc.nextLine();
 		int i;
-		for(i = 0; i < index; i++) {
-			if(name.equals(gradebook[i].getName())) {
+		for(i = 0; i < Gradebook.index; i++) {
+			if(name.equals(Gradebook.gradebook[i].getName())) {
 				//handle edge case where the element being removed is at the position
-				if(i == gradebook.length - 1) {
-					gradebook[i] = null;
-					index--;
+				if(i == Gradebook.gradebook.length - 1) {
+					Gradebook.gradebook[i] = null;
+					Gradebook.index--;
 					return;
 				}
 				//shift all grades after the one we want to remove, 1 position to the left
-				for(int j = i; j < index - 1; j++) {
-					gradebook[j] = gradebook[j + 1];
+				for(int j = i; j < Gradebook.index - 1; j++) {
+					Gradebook.gradebook[j] = Gradebook.gradebook[j + 1];
 				}
-				index--;
+				Gradebook.index--;
 				return;
 			}
 		}
 		//if the grade wasn't found, throw exception
 		try {
-			if(i == index) {
+			if(i == Gradebook.index) {
 				throw new InvalidGradeException();
 			}
 		} catch(InvalidGradeException e) {
@@ -236,12 +235,12 @@ public class GradebookHelper {
 	}
 	
 	//this function prints out all of the grades currently in the gradebook
-	static void printGrades(Assignment[]gradebook, int index) {
+	static void printGrades() {
 		
 		//throw exception if the gradebook is empty
 		System.out.println("\n");
 		try {
-			if(index == 0) {
+			if(Gradebook.index == 0) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -250,18 +249,18 @@ public class GradebookHelper {
 		}
 		
 		//print all of the grades to console
-		for(int i = 0; i < index; i++) {
-			System.out.println(gradebook[i].toString() + "\n");
+		for(int i = 0; i < Gradebook.index; i++) {
+			System.out.println(Gradebook.gradebook[i].toString() + "\n");
 		}
 		
 	}
 	
 	//this function prints the average score of all of the grades in the gradebook
-	static void printAverage(Assignment[]gradebook, int index) {
+	static void printAverage() {
 		
 		//throw exception if gradebook is empty
 		try {
-			if(index == 0) {
+			if(Gradebook.index == 0) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -271,18 +270,18 @@ public class GradebookHelper {
 		
 		//calculate the average
 		double total = 0;
-		for(int i = 0; i < index; i++) {
-			total += gradebook[i].getScore();
+		for(int i = 0; i < Gradebook.index; i++) {
+			total += Gradebook.gradebook[i].getScore();
 		}
-		System.out.println("Average: " + (total / (index)));
+		System.out.println("Average: " + (total / (Gradebook.index)));
 	}
 	
 	//this function prints the max and min scores of the gradebook
-	static void printExtrema(Assignment[]gradebook, int index) {
+	static void printExtrema() {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(index == 0) {
+			if(Gradebook.index == 0) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -292,13 +291,13 @@ public class GradebookHelper {
 		
 		//calculate the max and min
 		double max, min;
-		max = min = gradebook[0].getScore();
-		for(int i = 1; i < index; i++) {
-			if(gradebook[i].getScore() > max) {
-				max = gradebook[i].getScore();
+		max = min = Gradebook.gradebook[0].getScore();
+		for(int i = 1; i < Gradebook.index; i++) {
+			if(Gradebook.gradebook[i].getScore() > max) {
+				max = Gradebook.gradebook[i].getScore();
 			}
-			if(gradebook[i].getScore() < min) {
-				min = gradebook[i].getScore();
+			if(Gradebook.gradebook[i].getScore() < min) {
+				min = Gradebook.gradebook[i].getScore();
 			}
 		}
 		
@@ -308,11 +307,11 @@ public class GradebookHelper {
 	}
 	
 	//prints the average number of questions on all of the current quizzes
-	static void printQuizAverage(Assignment[]gradebook, int index) {
+	static void printQuizAverage() {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(index == 0) {
+			if(Gradebook.index == 0) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -323,11 +322,11 @@ public class GradebookHelper {
 		
 		double avg = 0;
 		int total = 0;
-		for(int i = 0; i < index; i++) {
+		for(int i = 0; i < Gradebook.index; i++) {
 			//if the grade is a quiz, add its question count to total
-			if(gradebook[i] instanceof Quiz) {
+			if(Gradebook.gradebook[i] instanceof Quiz) {
 				total++;
-				Quiz temp = (Quiz)gradebook[i];
+				Quiz temp = (Quiz)Gradebook.gradebook[i];
 				avg += temp.getQuestionCount();	
 			}
 		}
@@ -343,11 +342,11 @@ public class GradebookHelper {
 	}
 	
 	//prints all of the readings from discussions to console
-	static void printReadings(Assignment[]gradebook, int index) {
+	static void printReadings() {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(index == 0) {
+			if(Gradebook.index == 0) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -357,10 +356,10 @@ public class GradebookHelper {
 		
 		
 		int total = 0;
-		for(int i = 0; i < index; i++) {
+		for(int i = 0; i < Gradebook.index; i++) {
 			//if the grade is a discussion, print its reading to console
-			if(gradebook[i] instanceof Discussion) {
-				Discussion temp = (Discussion)gradebook[i];
+			if(Gradebook.gradebook[i] instanceof Discussion) {
+				Discussion temp = (Discussion)Gradebook.gradebook[i];
 				System.out.println("" + total + ". " + temp.getReading());
 				total++;
 			}
@@ -373,11 +372,11 @@ public class GradebookHelper {
 	}
 	
 	//prints all of the concepts from programs to console
-	static void printConcepts(Assignment[]gradebook, int index) {
+	static void printConcepts() {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(index == 0) {
+			if(Gradebook.index == 0) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -386,10 +385,10 @@ public class GradebookHelper {
 		}
 		
 		int total = 0;
-		for(int i = 0; i < index; i++) {
+		for(int i = 0; i < Gradebook.index; i++) {
 			//if the grade is a program, print its concept to console
-			if(gradebook[i] instanceof Program) {
-				Program temp = (Program)gradebook[i];
+			if(Gradebook.gradebook[i] instanceof Program) {
+				Program temp = (Program)Gradebook.gradebook[i];
 				System.out.println("" + total + ". " + temp.getConcept());
 				total++;
 			}
