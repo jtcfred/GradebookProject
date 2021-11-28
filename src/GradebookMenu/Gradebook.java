@@ -42,11 +42,11 @@ public class Gradebook {
 		String menu = "0 - Add grades" + "\n" +
 						"1 - Remove grades" + "\n" +
 						"2 - Print grades" + "\n" +
-						"3 - Print score average" +"\n" +
-						"4 - Print highest/lowest score" + "\n" +
-						"5 - Print quiz question average" + "\n" +
-						"6 - Print discussion associated readings" + "\n" +
-						"7 - Print program concepts" + "\n" + 
+						"3 - Print to File\n" +
+						"4 - Read from File\n" +
+						"5 - To MySQL\n" +
+						"6 - From MySQL\n" +
+						"7 - MySQL Search\n" +
 						"8 - Exit program" + "\n";
 		
 		//give the user menu options until they make a valid selection from the options
@@ -77,27 +77,27 @@ public class Gradebook {
 				System.out.println("");
 				break;
 			case 3:
-				System.out.println("You selected you selected print average");
+				System.out.println("You selected you selected print to file");
 				GradebookHelper.printAverage();
 				System.out.println("");
 				break;
 			case 4:
-				System.out.println("You selected print extrema");
+				System.out.println("You selected read from file");
 				GradebookHelper.printExtrema();
 				System.out.println("");
 				break;
 			case 5:
-				System.out.println("You selected print quiz average");
+				System.out.println("You selected to MySQL");
 				GradebookHelper.printQuizAverage();
 				System.out.println("");
 				break;
 			case 6:
-				System.out.println("You selected print readings");
+				System.out.println("You selected from MySQL");
 				GradebookHelper.printReadings();
 				System.out.println("");
 				break;
 			case 7:
-				System.out.println("You selected print concepts");
+				System.out.println("You selected MySQL search");
 				GradebookHelper.printConcepts();
 				System.out.println("");
 				break;
