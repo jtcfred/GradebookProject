@@ -83,14 +83,6 @@ public class GradebookHelper {
 	
 	//Adds a grade at the current index in the gradebook
 	static void addGrade() {
-		try {
-			if(Gradebook.gradebook.size() == Gradebook.maxSize) {
-				throw new GradebookFullException();
-			}
-		} catch(GradebookFullException e) {
-			System.out.println("The gradebook is full! You cannot add any more grades.");
-			return;
-		}
 		int input = -1;
 		do {
 			try {
@@ -205,7 +197,7 @@ public class GradebookHelper {
 		
 		System.out.println("Enter the name of the grade you want to remove: ");
 		String name = Gradebook.sc.nextLine();
-		
+		int size = Gradebook.gradebook.size();
 		int i;
 		for(i = 0; i < Gradebook.gradebook.size(); i++) {
 			if(name.equals(Gradebook.gradebook.get(i).getName())) {
@@ -215,7 +207,7 @@ public class GradebookHelper {
 		
 		//if the grade wasn't found, throw exception
 		try {
-			if(i == Gradebook.gradebook.size()) {
+			if(i == size) {
 				throw new InvalidGradeException();
 			}
 		} catch(InvalidGradeException e) {

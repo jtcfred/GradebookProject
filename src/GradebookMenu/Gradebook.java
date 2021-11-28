@@ -5,6 +5,7 @@
  */
 package GradebookMenu;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -13,30 +14,11 @@ public class Gradebook {
 	
 	//some static variables to use in my functions at the bottom
 	static List<Assignment> gradebook = new ArrayList<>();
-	static int maxSize = 0;
 	static Scanner sc = new Scanner(System.in);
 	
 	public static void main(String args[]) {
 		
 		System.out.println("Welcome to the Gradebook");
-		//make sure the size of the gradebook from user input is valid
-		do {
-			try {
-				System.out.println("Enter the size of the gradebook (max of 20, min of 1): ");
-				maxSize = Integer.parseInt(sc.nextLine());
-				if(maxSize > 20 || maxSize < 1) {
-					System.out.println("Please enter a size in the range of [1,20]");
-					continue;
-				}
-			} catch(NumberFormatException e) {
-				System.out.println("You must enter a valid number for the size.");
-				continue;
-			}
-			//if it makes it here, there were no problems and the input was valid, so break
-			//out of the loop
-			break;
-		} while(true);
-		
 		
 		int menuChoice = 0;
 		String menu = "0 - Add grades" + "\n" +
@@ -78,12 +60,28 @@ public class Gradebook {
 				break;
 			case 3:
 				System.out.println("You selected you selected print to file");
-				GradebookHelper.printAverage();
+				System.out.println("What would you like to name the file? (do not include the file extension)");
+				String filename = sc.nextLine();
+				
+				//call the function to save the gradebook to file
+				try {
+					GradebookIO.save(filename);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				System.out.println("");
 				break;
 			case 4:
 				System.out.println("You selected read from file");
-				GradebookHelper.printExtrema();
+				System.out.println("Which file would you like to read from? (do not include the file extension)");
+				String readFilename = sc.nextLine();
+				
+				//call function to read file to gradebook
+				try {
+					GradebookIO.readFile(readFilename);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				System.out.println("");
 				break;
 			case 5:
