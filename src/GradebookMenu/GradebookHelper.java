@@ -7,8 +7,10 @@ package GradebookMenu;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 
 import Assignments.*;
+import Comparators.*;
 import GradebookExceptions.*;
 
 public class GradebookHelper {
@@ -82,7 +84,7 @@ public class GradebookHelper {
 	//Adds a grade at the current index in the gradebook
 	static void addGrade() {
 		try {
-			if(Gradebook.index == Gradebook.gradebook.length) {
+			if(Gradebook.gradebook.size() == Gradebook.maxSize) {
 				throw new GradebookFullException();
 			}
 		} catch(GradebookFullException e) {
@@ -134,8 +136,7 @@ public class GradebookHelper {
 				
 				//Make the quiz object and add to the gradebook
 				Quiz quiz = new Quiz(score, letter, name, dueDate, questionCount);
-				Gradebook.gradebook[Gradebook.index] = quiz;
-				Gradebook.index++;
+				Gradebook.gradebook.add(quiz);
 				break;
 			}
 			if(input == 1) {
@@ -158,8 +159,7 @@ public class GradebookHelper {
 				
 				//make the discussion object and add to the gradebook
 				Discussion discussion = new Discussion(score, letter, name, dueDate, reading);
-				Gradebook.gradebook[Gradebook.index] = discussion;
-				Gradebook.index++;
+				Gradebook.gradebook.add(discussion);
 				break;
 			}
 			if(input == 2) {
@@ -182,8 +182,7 @@ public class GradebookHelper {
 				
 				//make the program object and add to the gradebook
 				Program program = new Program(score, letter, name, dueDate, concept);
-				Gradebook.gradebook[Gradebook.index] = program;
-				Gradebook.index++;
+				Gradebook.gradebook.add(program);
 				break;
 			}
 			//if it makes it here, they did not make a valid selection
@@ -196,7 +195,7 @@ public class GradebookHelper {
 		
 		//don't let the user remove a grade if the gradebook is empty
 		try {
-			if(Gradebook.index == 0) {
+			if(Gradebook.gradebook.isEmpty()) {
 				throw new GradebookEmptyException();
 			}
 		} catch (GradebookEmptyException e) {
@@ -206,32 +205,24 @@ public class GradebookHelper {
 		
 		System.out.println("Enter the name of the grade you want to remove: ");
 		String name = Gradebook.sc.nextLine();
+		
 		int i;
-		for(i = 0; i < Gradebook.index; i++) {
-			if(name.equals(Gradebook.gradebook[i].getName())) {
-				//handle edge case where the element being removed is at the position
-				if(i == Gradebook.gradebook.length - 1) {
-					Gradebook.gradebook[i] = null;
-					Gradebook.index--;
-					return;
-				}
-				//shift all grades after the one we want to remove, 1 position to the left
-				for(int j = i; j < Gradebook.index - 1; j++) {
-					Gradebook.gradebook[j] = Gradebook.gradebook[j + 1];
-				}
-				Gradebook.index--;
-				return;
+		for(i = 0; i < Gradebook.gradebook.size(); i++) {
+			if(name.equals(Gradebook.gradebook.get(i).getName())) {
+				Gradebook.gradebook.remove(i);
 			}
 		}
+		
 		//if the grade wasn't found, throw exception
 		try {
-			if(i == Gradebook.index) {
+			if(i == Gradebook.gradebook.size()) {
 				throw new InvalidGradeException();
 			}
 		} catch(InvalidGradeException e) {
 			System.out.println("A grade with that name is not in the gradebook.");
 			return;
 		}
+		System.out.println("The grade " + name +" was successfully removed");
 	}
 	
 	//this function prints out all of the grades currently in the gradebook
@@ -240,17 +231,49 @@ public class GradebookHelper {
 		//throw exception if the gradebook is empty
 		System.out.println("\n");
 		try {
-			if(Gradebook.index == 0) {
+			if(Gradebook.gradebook.isEmpty()) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
 			System.out.println("The gradebook is empty. There are no grades to print.");
 			return;
 		}
+		int subMenuChoice = -1;
+		String printMenu = "Select what you want to sort the grades by: \n" +
+							"0 - Score (numeric)\n" +
+							"1 - Letter\n" +
+							"2 - Alphabetical Name\n" +
+							"3 - Due Date\n";
+		do {
+			try {
+				System.out.println("Please select an option from below: ");
+				System.out.println(printMenu);
+				subMenuChoice = Integer.parseInt(Gradebook.sc.nextLine());
+			}catch(NumberFormatException e) {
+				System.out.println("You must enter a valid number for the selection.");
+				continue;
+			}
+			
+			switch(subMenuChoice) {
+			case 0:
+				Collections.sort(Gradebook.gradebook, new ScoreComparator());
+				break;
+			case 1:
+				Collections.sort(Gradebook.gradebook, new LetterComparator());
+				break;
+			case 2:
+				Collections.sort(Gradebook.gradebook, new NameComparator());
+				break;
+			case 3:
+				Collections.sort(Gradebook.gradebook, new DueDateComparator());
+				break;
+			}
+			
+		}while(subMenuChoice > 3 || subMenuChoice < 0);
 		
 		//print all of the grades to console
-		for(int i = 0; i < Gradebook.index; i++) {
-			System.out.println(Gradebook.gradebook[i].toString() + "\n");
+		for(int i = 0; i < Gradebook.gradebook.size(); i++) {
+			System.out.println(Gradebook.gradebook.get(i).toString() + "\n");
 		}
 		
 	}
@@ -260,7 +283,7 @@ public class GradebookHelper {
 		
 		//throw exception if gradebook is empty
 		try {
-			if(Gradebook.index == 0) {
+			if(Gradebook.gradebook.isEmpty()) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -270,10 +293,10 @@ public class GradebookHelper {
 		
 		//calculate the average
 		double total = 0;
-		for(int i = 0; i < Gradebook.index; i++) {
-			total += Gradebook.gradebook[i].getScore();
+		for(int i = 0; i < Gradebook.gradebook.size(); i++) {
+			total += Gradebook.gradebook.get(i).getScore();
 		}
-		System.out.println("Average: " + (total / (Gradebook.index)));
+		System.out.println("Average: " + (total / (Gradebook.gradebook.size())));
 	}
 	
 	//this function prints the max and min scores of the gradebook
@@ -281,7 +304,7 @@ public class GradebookHelper {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(Gradebook.index == 0) {
+			if(Gradebook.gradebook.isEmpty()) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -291,13 +314,13 @@ public class GradebookHelper {
 		
 		//calculate the max and min
 		double max, min;
-		max = min = Gradebook.gradebook[0].getScore();
-		for(int i = 1; i < Gradebook.index; i++) {
-			if(Gradebook.gradebook[i].getScore() > max) {
-				max = Gradebook.gradebook[i].getScore();
+		max = min = Gradebook.gradebook.get(0).getScore();
+		for(int i = 1; i < Gradebook.gradebook.size(); i++) {
+			if(Gradebook.gradebook.get(i).getScore() > max) {
+				max = Gradebook.gradebook.get(i).getScore();
 			}
-			if(Gradebook.gradebook[i].getScore() < min) {
-				min = Gradebook.gradebook[i].getScore();
+			if(Gradebook.gradebook.get(i).getScore() < min) {
+				min = Gradebook.gradebook.get(i).getScore();
 			}
 		}
 		
@@ -311,7 +334,7 @@ public class GradebookHelper {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(Gradebook.index == 0) {
+			if(Gradebook.gradebook.isEmpty()) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -322,11 +345,11 @@ public class GradebookHelper {
 		
 		double avg = 0;
 		int total = 0;
-		for(int i = 0; i < Gradebook.index; i++) {
+		for(int i = 0; i < Gradebook.gradebook.size(); i++) {
 			//if the grade is a quiz, add its question count to total
-			if(Gradebook.gradebook[i] instanceof Quiz) {
+			if(Gradebook.gradebook.get(i) instanceof Quiz) {
 				total++;
-				Quiz temp = (Quiz)Gradebook.gradebook[i];
+				Quiz temp = (Quiz)Gradebook.gradebook.get(i);
 				avg += temp.getQuestionCount();	
 			}
 		}
@@ -346,7 +369,7 @@ public class GradebookHelper {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(Gradebook.index == 0) {
+			if(Gradebook.gradebook.isEmpty()) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -356,10 +379,10 @@ public class GradebookHelper {
 		
 		
 		int total = 0;
-		for(int i = 0; i < Gradebook.index; i++) {
+		for(int i = 0; i < Gradebook.gradebook.size(); i++) {
 			//if the grade is a discussion, print its reading to console
-			if(Gradebook.gradebook[i] instanceof Discussion) {
-				Discussion temp = (Discussion)Gradebook.gradebook[i];
+			if(Gradebook.gradebook.get(i) instanceof Discussion) {
+				Discussion temp = (Discussion)Gradebook.gradebook.get(i);
 				System.out.println("" + total + ". " + temp.getReading());
 				total++;
 			}
@@ -376,7 +399,7 @@ public class GradebookHelper {
 		
 		//throw exception if the gradebook is empty
 		try {
-			if(Gradebook.index == 0) {
+			if(Gradebook.gradebook.isEmpty()) {
 				throw new GradebookEmptyException();
 			}
 		} catch(GradebookEmptyException e) {
@@ -385,10 +408,10 @@ public class GradebookHelper {
 		}
 		
 		int total = 0;
-		for(int i = 0; i < Gradebook.index; i++) {
+		for(int i = 0; i < Gradebook.gradebook.size(); i++) {
 			//if the grade is a program, print its concept to console
-			if(Gradebook.gradebook[i] instanceof Program) {
-				Program temp = (Program)Gradebook.gradebook[i];
+			if(Gradebook.gradebook.get(i) instanceof Program) {
+				Program temp = (Program)Gradebook.gradebook.get(i);
 				System.out.println("" + total + ". " + temp.getConcept());
 				total++;
 			}

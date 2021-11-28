@@ -5,26 +5,27 @@
  */
 package GradebookMenu;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Gradebook {
 	
 	//some static variables to use in my functions at the bottom
-	static Assignment[] gradebook;
-	static int index = 0;
+	static List<Assignment> gradebook = new ArrayList<>();
+	static int maxSize = 0;
 	static Scanner sc = new Scanner(System.in);
 	
 	public static void main(String args[]) {
 		
 		System.out.println("Welcome to the Gradebook");
-		int size = 0;
 		//make sure the size of the gradebook from user input is valid
 		do {
 			try {
 				System.out.println("Enter the size of the gradebook (max of 20, min of 1): ");
-				size = Integer.parseInt(sc.nextLine());
-				if(size > 20 || size < 1) {
-					System.out.println("Pleaes enter a size in the range of [1,20]");
+				maxSize = Integer.parseInt(sc.nextLine());
+				if(maxSize > 20 || maxSize < 1) {
+					System.out.println("Please enter a size in the range of [1,20]");
 					continue;
 				}
 			} catch(NumberFormatException e) {
@@ -36,10 +37,8 @@ public class Gradebook {
 			break;
 		} while(true);
 		
-		//initialize the gradebook with the specified size
-		gradebook = new Assignment[size];
 		
-		int menuChoice = 5;
+		int menuChoice = 0;
 		String menu = "0 - Add grades" + "\n" +
 						"1 - Remove grades" + "\n" +
 						"2 - Print grades" + "\n" +
