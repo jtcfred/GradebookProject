@@ -13,8 +13,8 @@ import java.util.Scanner;
 public class Gradebook {
 	
 	//some static variables to use in my functions at the bottom
-	static List<Assignment> gradebook = new ArrayList<>();
-	static Scanner sc = new Scanner(System.in);
+	public static List<Assignment> gradebook = new ArrayList<>();
+	public static Scanner sc = new Scanner(System.in);
 	
 	public static void main(String args[]) {
 		
