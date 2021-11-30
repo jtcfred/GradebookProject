@@ -202,6 +202,7 @@ public class GradebookHelper {
 		for(i = 0; i < Gradebook.gradebook.size(); i++) {
 			if(name.equals(Gradebook.gradebook.get(i).getName())) {
 				Gradebook.gradebook.remove(i);
+				break;
 			}
 		}
 		

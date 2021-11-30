@@ -5,6 +5,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import Assignments.Discussion;
 import Assignments.Program;
@@ -16,10 +18,11 @@ import GradebookMenu.Gradebook;
 public class GradebookDB {
 	
 	public static void insertAll() {
-		String tableSQL = "Create TABLE IF NOT EXISTS Gradebook (\n" +
+		String removeTable = "DROP TABLE IF EXISTS Gradebook;\n";
+		String tableSQL = "CREATE TABLE IF NOT EXISTS Gradebook (\n" +
 						"GradebookID INT PRIMARY KEY AUTO_INCREMENT,\n" +
 						"Type VARCHAR(20) NOT NULL,\n" +
-						"Name VARHCAR(100) NOT NULL,\n" +
+						"Name VARCHAR(100) NOT NULL,\n" +
 						"Score DECIMAL NOT NULL,\n" +
 						"Letter char NOT NULL,\n" +
 						"Date VARCHAR(20) NOT NULL,\n" +
@@ -31,11 +34,15 @@ public class GradebookDB {
 					"VALUES " +
 					"(?, ?, ?, ?, ?, ?)";
 		Statement s;
+		Statement r;
 		PreparedStatement ps;
 		try {
 			//create the table if it doesnt exist
+			r = DBUtil.getConnection().createStatement();
+			r.execute(removeTable);
 			s = DBUtil.getConnection().createStatement();
 			s.execute(tableSQL);
+			
 			
 			//insert the grades
 			ps = DBUtil.getConnection().prepareStatement(sql);
@@ -163,6 +170,237 @@ public class GradebookDB {
 		
 	}
 	
+	public static void allQuizzes() {
+		
+		List<Assignment> quizzes = new ArrayList<>();
+		
+		try (Statement statement = DBUtil.getConnection().createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM Gradebook WHERE Type = 'Quiz'")) {
+            while (rs.next()) {
+            	
+            	String name = rs.getString("Name");
+				Double score = rs.getDouble("Score");
+				char letter = rs.getString("Letter").charAt(0);
+				LocalDate date = LocalDate.parse(rs.getString("Date"));
+				int questions = Integer.parseInt(rs.getString("Special"));
+				Quiz quiz = new Quiz(score, letter, name, date, questions);
+            	quizzes.add(quiz);
+            }
+            
+            System.out.println();
+            for(Assignment a : quizzes) {
+            	System.out.println(a.toString() + "\n");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+	}
+	
+	public static void allPrograms() {
+		
+		List<Assignment> programs = new ArrayList<>();
+		
+		try (Statement statement = DBUtil.getConnection().createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM Gradebook WHERE Type = 'Program'")) {
+            while (rs.next()) {
+            	
+            	String name = rs.getString("Name");
+				Double score = rs.getDouble("Score");
+				char letter = rs.getString("Letter").charAt(0);
+				LocalDate date = LocalDate.parse(rs.getString("Date"));
+				String concept = rs.getString("Special");
+				Program program = new Program(score, letter, name, date, concept);
+            	programs.add(program);
+            }
+            
+            System.out.println();
+            for(Assignment a : programs) {
+            	System.out.println(a.toString() + "\n");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+	}
+	
+	public static void allDiscussions() {
+		
+		List<Assignment> discussions = new ArrayList<>();
+		
+		try (Statement statement = DBUtil.getConnection().createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM Gradebook WHERE Type = 'Discussion'")) {
+            while (rs.next()) {
+            	
+            	String name = rs.getString("Name");
+				Double score = rs.getDouble("Score");
+				char letter = rs.getString("Letter").charAt(0);
+				LocalDate date = LocalDate.parse(rs.getString("Date"));
+				String reading = rs.getString("Special");
+				Discussion discussion = new Discussion(score, letter, name, date, reading);
+            	discussions.add(discussion);
+            }
+            
+            System.out.println();
+            for(Assignment a : discussions) {
+            	System.out.println(a.toString() + "\n");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+	}
+	
+	public static void rangedScore(double lower, double upper) {
+		
+		List<Assignment> rangedScores = new ArrayList<>();
+		
+		try (Statement statement = DBUtil.getConnection().createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM Gradebook WHERE Score BETWEEN " + lower + " AND " + upper)) {
+            while (rs.next()) {
+            	
+            	String type = rs.getString("Type");
+            	
+            	if(type.equals("Quiz")) {
+            		String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					int questions = Integer.parseInt(rs.getString("Special"));
+					Quiz quiz = new Quiz(score, letter, name, date, questions);
+					
+					rangedScores.add(quiz);
+					//if its a discussion
+				} else if(type.equals("Discussion")) {
+					String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					String reading = rs.getString("Special");
+					Discussion discussion = new Discussion(score, letter, name, date, reading);
+					
+					rangedScores.add(discussion);
+					//if its a program
+				} else if(type.equals("Program")) {
+					String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					String concept = rs.getString("Special");
+					Program program = new Program(score, letter, name, date, concept);
+					
+						rangedScores.add(program);
+				}
+            }
+            
+            System.out.println();
+            for(Assignment a : rangedScores) {
+            	System.out.println(a.toString() + "\n");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+	}
 	
 	
+	public static void rangedDate(LocalDate lower, LocalDate upper) {
+		
+		List<Assignment> rangedDates = new ArrayList<>();
+		
+		try (Statement statement = DBUtil.getConnection().createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM Gradebook WHERE Date BETWEEN"
+                		+ " CAST('" + lower.toString() + "' AS DATE) AND CAST('" + upper.toString() + "' AS DATE)")) {
+			
+            while (rs.next()) {
+            	
+            	String type = rs.getString("Type");
+            	
+            	if(type.equals("Quiz")) {
+            		String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					int questions = Integer.parseInt(rs.getString("Special"));
+					Quiz quiz = new Quiz(score, letter, name, date, questions);
+					
+					rangedDates.add(quiz);
+					//if its a discussion
+				} else if(type.equals("Discussion")) {
+					String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					String reading = rs.getString("Special");
+					Discussion discussion = new Discussion(score, letter, name, date, reading);
+					
+					rangedDates.add(discussion);
+					//if its a program
+				} else if(type.equals("Program")) {
+					String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					String concept = rs.getString("Special");
+					Program program = new Program(score, letter, name, date, concept);
+					
+					rangedDates.add(program);
+				}
+            }
+            
+            System.out.println();
+            for(Assignment a : rangedDates) {
+            	System.out.println(a.toString() + "\n");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+	}
+	
+	public static void evenScore() {
+		
+		List<Assignment> evenScores = new ArrayList<>();
+		
+		try (Statement statement = DBUtil.getConnection().createStatement();
+                ResultSet rs = statement.executeQuery("SELECT * FROM Gradebook WHERE Score % 2 = 0")) {
+            while (rs.next()) {
+            	
+            	String type = rs.getString("Type");
+            	
+            	if(type.equals("Quiz")) {
+            		String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					int questions = Integer.parseInt(rs.getString("Special"));
+					Quiz quiz = new Quiz(score, letter, name, date, questions);
+					
+					evenScores.add(quiz);
+					//if its a discussion
+				} else if(type.equals("Discussion")) {
+					String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					String reading = rs.getString("Special");
+					Discussion discussion = new Discussion(score, letter, name, date, reading);
+					
+					evenScores.add(discussion);
+					//if its a program
+				} else if(type.equals("Program")) {
+					String name = rs.getString("Name");
+					Double score = rs.getDouble("Score");
+					char letter = rs.getString("Letter").charAt(0);
+					LocalDate date = LocalDate.parse(rs.getString("Date"));
+					String concept = rs.getString("Special");
+					Program program = new Program(score, letter, name, date, concept);
+					
+					evenScores.add(program);
+				}
+            }
+            
+            System.out.println();
+            for(Assignment a : evenScores) {
+            	System.out.println(a.toString() + "\n");
+            }
+        } catch (SQLException e) {
+            System.out.println(e);
+        }
+	}
 }
